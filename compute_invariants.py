@@ -4,7 +4,8 @@ from sage.all import *
 def compute_field(K):
     # Basic data
     poly = K.defining_polynomial()
-    dK = K.discriminant()                           
+    dK = K.discriminant()
+    C = K.class_group()
     hK = K.class_number()                           
     rK = K.regulator()                              
     mb = K.minkowski_bound()
@@ -29,7 +30,7 @@ def compute_field(K):
     # Automorphisms and Galois theory
     autos = K.automorphisms()
     galois_grp = K.galois_group()
-    galois_clsr = K.galois_closure()
+    galois_clsr = K.galois_closure('v')
 
     field_data = {}
     field_data["min_poly"] = poly
@@ -37,6 +38,7 @@ def compute_field(K):
     field_data["hk"] = hK
     field_data["rk"] = rK
     field_data["mb"] = mb
+    field_data["class_group"] = C
     field_data["unit_group"] = U
     field_data["fund_units"] = fu
     field_data["unit_tor_sbgrp"] = tor
@@ -46,19 +48,15 @@ def compute_field(K):
     field_data["galois_group"] = galois_grp
     field_data["galois_clsr"] = galois_clsr
 
-# Compute the field invariants of the first n real quadratic fields
-def compute_invariants(n):
-    orig_n = n
-    invariants = {}
-    i = 2
-    while n > 0:
-        if is_squarefree(i):
-            x = polygen(ZZ, 'x')
-            K = NumberField(x**Integer(2) - i, names=('u',))
-            invariants[K] = compute_field(K)
-            n-=1
-        i+=1
+    return field_data
 
-        if n-1 > 0 & (i % 10 == 0):
-            print(str(round(((orig_n-n) / (orig_n))*100, 2)) + "%")
-    return invariants
+# Compute the field invariants of the first n real quadratic fields
+def compute_invariants(deg, d_bound):
+    fields = enumerate_totallyreal_fields_prim(deg, d_bound)
+    field_data = []
+    for field in fields:
+        R = PolynomialRing(QQ, 'x')
+        poly = R(field[1])
+        K = NumberField(poly, 'u')
+        field_data.append(compute_field(K))
+    return field_data

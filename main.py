@@ -1,8 +1,6 @@
 from sage.all import *
 import json
 from compute_invariants import *
-from plot_invariants import *
-from track_fu_spikes import *
 
 def main(n=-1):
     if n == -1:
@@ -11,9 +9,6 @@ def main(n=-1):
             n = int(input("Input not accepted. Enter 0 for real and 1 for imaginary: "))
 
     invariants = compute_invariants(n)
-    if n < 10000:
-        plot_invariants(invariants)
-    inv_spikes = plot_fu_spikes(invariants)
 
     to_json(invariants, inv_spikes, 'invariants_data.json')
 
@@ -30,13 +25,12 @@ def to_json(invariants, inv_spikes, filename):
             field_info['defining_polynomial'] = str(field.polynomial())
 
             # Store the invariants
-            field_info['invariants'] = {
-                'd': int(invariants[0]),        # Discriminant of the field (d)
-                'dK': int(invariants[1]),       # Discriminant of the field (d_K)
-                'hK': int(invariants[2]),       # Class number of K (h_K)
-                'fu': str(invariants[3]),       # Fundamental unit (fu), converted to string
-                'rK': float(invariants[4]),     # Regulator of K (R_K)
-                'mb': float(invariants[5])      # Minkowski bound of K (MB)
+            field_info['invariants'] = {        
+                'dK': int(invariants[1]),   
+                'hK': int(invariants[2]),       
+                'fu': str(invariants[3]),   
+                'rK': float(invariants[4]),
+                'mb': float(invariants[5])      
             }
 
             # Store the field info under its corresponding key
